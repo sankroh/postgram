@@ -1,6 +1,7 @@
 .wkrc
 .DS_Store
 ve/*
+env.py
 *.py[cod]
 
 # C extensions
