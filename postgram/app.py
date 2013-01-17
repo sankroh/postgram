@@ -43,7 +43,7 @@ def index():
         try:
             return '<img src="{0}"/><br>{1}<br>{2}<br>{3}'.format(resp_dict['data'][0]['images']['standard_resolution']['url'], resp_dict['data'][0]['location'], resp_dict['data'][0]['link'], gurl)
         except (KeyError, IndexError):
-            return str(resp_dict) + str(lat) + ' , ' + str(lng) + '\n' + gurl
+            return str(resp_dict) + str(lat) + ' , ' + str(lng) + '\n\n' + gurl
     else:
         return '{0}-{1}'.format(r.status_code, r.text)
 
