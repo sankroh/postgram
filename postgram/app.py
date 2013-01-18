@@ -1,6 +1,7 @@
 import json
 import os
 from random import random
+from math import sin, cos
 
 from flask import *
 import requests
@@ -11,6 +12,26 @@ app = Flask(__name__)
 
 
 def get_lat_lng():
+    """
+    We get a lat/lng point and then pick a point
+    within 50KM of it
+
+    Algorithm:
+    x,y (cartesian co-ordinates)
+    r,Θ (polar co-oridnates)
+
+    Δx = r * cos(Θ)
+    Δy = r * sin(Θ)
+
+    x1 = x + Δx
+    y1 = y + Δy
+
+    Δlat = x1 - x
+    Δlong = y1 - y
+
+    TODO: Verify results with:
+    Δσ  = arccos( cos(Δlat) - cos(lat1)*cos(lat2)*(1 - cos(Δlong) )
+    """
     multiplier = 10000;
     latitude=(random()*(90*multiplier))/multiplier
     longitude=(random()*(180*multiplier))/multiplier
