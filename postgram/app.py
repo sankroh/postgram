@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import json
 import os
 from random import random
@@ -33,8 +36,12 @@ def get_lat_lng():
     Δσ  = arccos( cos(Δlat) - cos(lat1)*cos(lat2)*(1 - cos(Δlong) )
     """
     multiplier = 10000;
-    latitude=(random()*(90*multiplier))/multiplier
-    longitude=(random()*(180*multiplier))/multiplier
+    radius = 50
+    # latitude=(random()*(90*multiplier))/multiplier
+    # longitude=(random()*(180*multiplier))/multiplier
+    latitude = random() * 90
+    longitude = random() * 180
+
     if round(random()*2) == 1:
         latitude*=1
     else:
@@ -43,6 +50,12 @@ def get_lat_lng():
         longitude*=1
     else:
         longitude*=-1
+
+    dx = radius * cos(45)
+    dy = radius * sin(45)
+
+    latitude += dx
+    longitude += dy
 
     return latitude,longitude
 
