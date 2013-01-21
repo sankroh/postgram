@@ -3,7 +3,7 @@
 
 import json
 import os
-from random import random
+from random import random, choice
 from math import sin, cos
 
 from flask import *
@@ -60,11 +60,19 @@ def get_lat_lng():
     return latitude,longitude
 
 
+def get_city_lat_lng():
+    """
+    Find a random city and return it's lat/lng
+    """
+    city = choice(city_list)
+    return city['lat'], city['lng']
+
+
 def get_data():
-    lat,lng = get_lat_lng()
+    lat,lng = get_city_lat_lng()
     auth = FOAUTH_USER, FOAUTH_PASSWORD
     data = {'distance': 5000, 'lat': lat, 'lng': lng}
-    r = requests.get(FOAUTH_URL, params=data, auth=auth)
+    r = requests.get(FOAUTH_IGRAM_URL, params=data, auth=auth)
     return r, lat, lng
 
 
@@ -83,6 +91,22 @@ def index():
 
 
 if __name__ == '__main__':
+    # Load city list into memory
+    f = open('postgram/cities1000.txt', 'r')
+    city_list = []
+    for line in f.xreadlines():
+        city = {}
+        line = line.split('\t')
+        try:
+            city['name'] = line[1]
+            city['lat'] = line[4]
+            city['lng'] = line[5]
+            city_list.append(city)
+        except (IndexError, KeyError):
+            pass
+
+    f.close()
+
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
     app.debug = True
