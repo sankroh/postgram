@@ -65,25 +65,37 @@ def get_city_lat_lng():
     Find a random city and return it's lat/lng
     """
     city = choice(city_list)
-    return city['lat'], city['lng']
+    return city['lat'], city['lng'], city['name']
 
 
 def get_data():
-    lat,lng = get_city_lat_lng()
+    lat,lng, name = get_city_lat_lng()
     auth = FOAUTH_USER, FOAUTH_PASSWORD
     data = {'distance': 5000, 'lat': lat, 'lng': lng}
-    r = requests.get(FOAUTH_IGRAM_URL, params=data, auth=auth)
-    return r, lat, lng
+    req = requests.get(FOAUTH_IGRAM_URL, params=data, auth=auth)
+
+    if req.status_code == 200 and not req.json()['data'] or req.status_code != 200:
+        flickr_params = {
+            'lat': lat,
+            'lon': lng,
+            'format': 'json',
+            'nojsoncallback': 1,
+            'method': 'flickr.photos.search',
+            'bbox': '-180,-90,180,90',
+        }
+        req = requests.get(FOAUTH_FLICKR_URL, params=flickr_params, auth=auth)
+
+    return req, lat, lng, name
 
 
 @app.route('/')
 def index():
-    r, lat, lng = get_data()
+    r, lat, lng, name = get_data()
     if r.status_code == 200 and len(r.text) > 0:
         resp_dict = json.loads(r.text)
         gurl = '<a href="https://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q={lat}+,+{lng}&vpsrc=0&ie=UTF8&t=m&z=3&iwloc=near">Google Maps</a>'.format(lat=lat,lng=lng)
         try:
-            return '<img src="{0}"/><br>{1}<br>{2}<br>{3}'.format(resp_dict['data'][0]['images']['standard_resolution']['url'], resp_dict['data'][0]['location'], resp_dict['data'][0]['link'], gurl)
+            return '<h1>{name}</h1><img src="{0}"/><br>{1}<br>{2}<br>{3}'.format(resp_dict['data'][0]['images']['standard_resolution']['url'], resp_dict['data'][0]['location'], resp_dict['data'][0]['link'], gurl, name=name)
         except (KeyError, IndexError):
             return str(resp_dict) + str(lat) + ' , ' + str(lng) + '\n\n' + gurl
     else:
